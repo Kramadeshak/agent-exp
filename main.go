@@ -9,6 +9,13 @@ import {
 	"github.com/anthropic/anthropic-sdk-go"
 }
 
+type ToolDefinition struct {
+	Name        string                         `json:"name"`
+	Description string                         `json:"description"`
+	InputSchema anthropic.ToolInputSchemaParam `json:"input_schema"`
+	Function    func(input json.RawMessage) (string, error)
+}
+
 func main() {
 	fmt.Println("Initializing agent...")
 	client := anthropic.NewClient()
@@ -21,23 +28,26 @@ func main() {
 		return scanner.Text(), true
 	}
 
-	agent := NewAgent(&client, getUserMessage)
+	tools := []ToolDefinition{}
+	agent := NewAgent(&client, getUserMessage, tools)
 	err := agent.Run(context.TODO())
 	if err != nil {
 		fmt.Printf("Error: %s\n", err.Error())
 	}
 }
 
-func NewAgent(client *anthropic.Client, getUserMessage func() (string, bool)) *Agent {
+func NewAgent(client *anthropic.Client, getUserMessage func() (string, bool), tools []ToolDefinition,) *Agent {
 	return &Agent{
 		client:         client,
 		getUserMessage: getUserMessage,
+		tools:          tools,
 	}
 }
 
 type Agent struct {
 	client         *anthropic.Client
 	getUserMessage func() (string, bool)
+	tools          []ToolDefinition
 }
 
 func (a *Agent) Run(ctx context.Context) error {

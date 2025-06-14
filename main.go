@@ -16,6 +16,20 @@ type ToolDefinition struct {
 	Function    func(input json.RawMessage) (string, error)
 }
 
+type Agent struct {
+	client         *anthropic.Client
+	getUserMessage func() (string, bool)
+	tools          []ToolDefinition
+}
+
+func NewAgent(client *anthropic.Client, getUserMessage func() (string, bool), tools []ToolDefinition,) *Agent {
+	return &Agent{
+		client:         client,
+		getUserMessage: getUserMessage,
+		tools:          tools,
+	}
+}
+
 func main() {
 	fmt.Println("Initializing agent...")
 	client := anthropic.NewClient()
@@ -34,20 +48,6 @@ func main() {
 	if err != nil {
 		fmt.Printf("Error: %s\n", err.Error())
 	}
-}
-
-func NewAgent(client *anthropic.Client, getUserMessage func() (string, bool), tools []ToolDefinition,) *Agent {
-	return &Agent{
-		client:         client,
-		getUserMessage: getUserMessage,
-		tools:          tools,
-	}
-}
-
-type Agent struct {
-	client         *anthropic.Client
-	getUserMessage func() (string, bool)
-	tools          []ToolDefinition
 }
 
 func (a *Agent) Run(ctx context.Context) error {

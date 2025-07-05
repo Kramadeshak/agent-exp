@@ -8,7 +8,6 @@ import {
 	"os"
 
 	"github.com/anthropic/anthropic-sdk-go"
-	"agent"
 	"github.com/invopop/jsonschema"
 }
 
@@ -24,6 +23,27 @@ type ReadFileInput struct {
 }
 
 var ReadFileInputSchema = GenerateSchema[ReadFileInput]()
+
+type ToolDefinition struct {
+	Name        string                         `json:"name"`
+	Description string                         `json:"description"`
+	InputSchema anthropic.ToolInputSchemaParam `json:"input_schema"`
+	Function    func(input json.RawMessage) (string, error)
+}
+
+type Agent struct {
+	client         *anthropic.Client
+	getUserMessage func() (string, bool)
+	tools          []ToolDefinition
+}
+
+func NewAgent(client *anthropic.Client, getUserMessage func() (string, bool), tools []ToolDefinition,) *Agent {
+	return &Agent{
+		client:         client,
+		getUserMessage: getUserMessage,
+		tools:          tools,
+	}
+}
 
 func main() {
 	fmt.Println("Initializing agent...")
@@ -78,9 +98,7 @@ func (a *Agent) Run(ctx context.Context) error {
 }
 
 func (a *Agent) runInference(ctx context.Context, conversation []anthropic.MessageParam) (*anthropic.Message, error) {
-	anthropicTools := []anthropic.ToolUnionParam{}
-	for _, tool := range a.tools {
-		anthropicTools = append(anthropicTools, anthropic.ToolUnionParam{
+	anthropicTools := []anthropic.ToolUnionParam{} for _, tool := range a.tools { anthropicTools = append(anthropicTools, anthropic.ToolUnionParam{
 			OfTool: &anthropic.ToolParam{
 				Name:        tool.Name,
 				Description: anthropic.String(tool.Description),

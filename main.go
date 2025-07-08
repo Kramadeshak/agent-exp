@@ -1,6 +1,6 @@
 package main
 
-import {
+import (
 	"bufio"
 	"context"
 	"encoding/json"
@@ -9,7 +9,7 @@ import {
 
 	"github.com/anthropic/anthropic-sdk-go"
 	"github.com/invopop/jsonschema"
-}
+)
 
 var ReadFileDefinition = ToolDefinition{
 	Name:        "read_file",

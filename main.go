@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/anthropic/anthropic-sdk-go"
+	"github.com/anthropics/anthropic-sdk-go"
 	"github.com/invopop/jsonschema"
 )
 
@@ -98,7 +98,8 @@ func (a *Agent) Run(ctx context.Context) error {
 }
 
 func (a *Agent) runInference(ctx context.Context, conversation []anthropic.MessageParam) (*anthropic.Message, error) {
-	anthropicTools := []anthropic.ToolUnionParam{} for _, tool := range a.tools { anthropicTools = append(anthropicTools, anthropic.ToolUnionParam{
+	anthropicTools := []anthropic.ToolUnionParam{}
+	for _, tool := range a.tools { anthropicTools = append(anthropicTools, anthropic.ToolUnionParam{
 			OfTool: &anthropic.ToolParam{
 				Name:        tool.Name,
 				Description: anthropic.String(tool.Description),
